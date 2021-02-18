@@ -3,12 +3,13 @@ class Entity {
         this.x = x;
         this.y = y;
         this.color = color;
+        this.size = 8;
     }
 
     draw(context) {
         context.save()
         context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, 7, 7);
+        context.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
         context.restore();
     }
 }
