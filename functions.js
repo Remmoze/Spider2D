@@ -2,16 +2,19 @@ function Random(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function AddLeg(x, y) {
+function AddLeg(leg) {
     if (legs.length > 3) {
         legs.shift()
     }
 
-    let newp = FindClosest(x, y);
+    let newp = FindClosest(leg.x, leg.y);
+    leg.x = newp.x;
+    leg.y = newp.y;
+    leg.color = "green";
 
-    legs.push(new Entity(newp.x, newp.y));
+    legs.push(leg);
+    RelocatePlayer();
 
-    RelocatePlayer()
 }
 
 function Move(x, y) {

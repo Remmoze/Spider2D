@@ -4,35 +4,37 @@ const context = canvas.getContext('2d');
 const input = new Input(window);
 
 const legs = [];
-const tempLeg = new Entity(-1, -1, "lightgreen")
-const Player = new Entity(10, 10, "white");
+const Player = new Entity(10, 10, { color: "white" });
 
 const boxes = [];
+const NewLeg = new DynamicEntity({ color: "lightgreen" });
+const NewBox = new DynamicBox();
 
 
 function main() {
-    let ctrl = false;
-
-    input.subscribeToKey("ControlLeft", state => {
-        ctrl = state;
-    });
+    input.subscribeToKey("ControlLeft");
 
     input.subscribeToMouse('click', (x, y) => {
-        if (ctrl) {
-            AddBox(x, y);
+        if (input.isKeyPressed("ControlLeft")) {
+            NewBox.progress(x, y);
+            if (NewBox.isFinished()) {
+                boxes.push(NewBox.build());
+                NewBox.clear(x, y);
+            }
         } else {
-            AddLeg(x, y);
+            let point = FindClosest(x, y);
+            NewLeg.update(point.x, point.y);
+            AddLeg(NewLeg.build())
+            NewLeg.clear();
         }
     });
 
     input.subscribeToMouse('move', (x, y) => {
-        if (ctrl) {
-            tempLeg.x = -1;
-            tempLeg.y = -1;
+        if (input.isKeyPressed("ControlLeft")) {
+            NewBox.update(x, y);
         } else {
             let point = FindClosest(x, y);
-            tempLeg.x = point ? point.x : -1;
-            tempLeg.y = point ? point.y : -1;
+            NewLeg.update(point.x, point.y);
         }
     });
 
@@ -68,12 +70,27 @@ function redraw(time) {
     for (let leg of legs) {
         leg.draw(context);
     }
-    if (tempLeg.x != -1 && tempLeg.y != -1) {
-        tempLeg.draw(context);
-    }
 
+    NewBox.draw(context);
+    NewLeg.draw(context);
     Player.draw(context);
     requestAnimationFrame(redraw);
+
+    //move to update();
+    let ctrl = input.isKeyJustPressed("ControlLeft");
+    if (ctrl != null) {
+        if (ctrl) {
+            NewBox.clear();
+            NewBox.show()
+            NewLeg.hide();
+        } else {
+            NewLeg.clear();
+            NewLeg.show();
+            NewBox.hide();
+        }
+    }
+
+    input.update();
 }
 
 main();
